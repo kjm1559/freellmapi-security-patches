@@ -167,6 +167,48 @@ for chunk in stream:
     print(chunk.choices[0].delta.content or "", end="", flush=True)
 ```
 
+**Tool calling**
+
+Pass OpenAI-style `tools` and `tool_choice`; the assistant response round-trips back through the proxy exactly like the OpenAI API. Multi-step flows (assistant `tool_calls` → `tool` role follow-up → final answer) work across every provider the router can reach.
+
+```python
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a city.",
+        "parameters": {
+            "type": "object",
+            "properties": {"city": {"type": "string"}},
+            "required": ["city"],
+        },
+    },
+}]
+
+# 1. Model asks for a tool call
+first = client.chat.completions.create(
+    model="auto",
+    messages=[{"role": "user", "content": "What's the weather in Karachi?"}],
+    tools=tools,
+    tool_choice="required",
+)
+call = first.choices[0].message.tool_calls[0]
+
+# 2. You execute the tool, feed the result back
+final = client.chat.completions.create(
+    model="auto",
+    messages=[
+        {"role": "user", "content": "What's the weather in Karachi?"},
+        first.choices[0].message,
+        {"role": "tool", "tool_call_id": call.id, "content": '{"temp_c": 32, "cond": "sunny"}'},
+    ],
+    tools=tools,
+)
+print(final.choices[0].message.content)
+```
+
+Works with `stream=True` as well — you'll get `delta.tool_calls` chunks followed by a `finish_reason: "tool_calls"` close. Under the hood, OpenAI-compatible providers (Groq, Cerebras, SambaNova, Mistral, OpenRouter, GitHub Models, HuggingFace, Cloudflare, Cohere compat) get the request passed through; Gemini requests get translated into Google's `functionDeclarations` / `functionResponse` shape and the response is translated back.
+
 Every response carries an `X-Routed-Via: <platform>/<model>` header so you can see which provider actually served each call. If a request fell over between providers, you'll also see `X-Fallback-Attempts: N`.
 
 ## Screenshots
