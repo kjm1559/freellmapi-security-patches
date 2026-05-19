@@ -16,7 +16,10 @@ export type Platform =
   | 'cohere'
   | 'cloudflare'
   | 'zhipu'
-  | 'ollama';
+  | 'ollama'
+  | 'kilo'
+  | 'pollinations'
+  | 'llm7';
 
 export interface Model {
   id: number;
