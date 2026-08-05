@@ -1,0 +1,15 @@
+# Caddy reverse proxy config for FreeLLMAPI on GCP.
+# Place at /opt/caddy/Caddyfile on the VM and run:
+#   sudo docker run -d --name caddy --restart unless-stopped \
+#     --network host \
+#     -v /opt/caddy/Caddyfile:/etc/caddy/Caddyfile:ro \
+#     -v caddy_data:/data -v caddy_config:/config \
+#     caddy:2
+#
+# Caddy auto-provisions a Let's Encrypt cert for the domain and
+# auto-renews it. Replace the domain with your own DuckDNS (or any)
+# domain.
+
+YOUR-DOMAIN.duckdns.org {
+    reverse_proxy localhost:3001
+}
