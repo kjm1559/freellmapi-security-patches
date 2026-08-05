@@ -35,6 +35,7 @@ Your router updates its own model catalog from a signed feed: new free models, q
 - [How it compares](#how-it-compares)
 - [Features](#features)
 - [Quick start](#quick-start)
+- [Self-hosting on GCP (free tier)](#self-hosting-on-gcp-free-tier)
 - [Desktop app](#desktop-app)
 - [Works with OpenAI-compatible clients](#works-with-openai-compatible-clients)
 - [Languages](#languages)
@@ -174,6 +175,18 @@ Open http://localhost:3001, add your provider keys on the **Keys** page, reorder
 On Windows, the easiest path is the desktop **[`.exe` installer from Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest)** (below). On Android, see the experimental [Termux guide](docs/install/android-termux.md).
 
 Everything else — Docker Compose, local development, declarative startup config, production builds, LAN access, and backups — is in **[docs/install.md](docs/install.md)**.
+
+## Self-hosting on GCP (free tier)
+
+Run FreeLLMAPI on a Google Cloud **e2-micro** (Always Free, **$0/month**) behind a **Caddy** reverse proxy with a free **DuckDNS** domain and automatic Let's Encrypt HTTPS. Includes budget guardrails and quota caps so the deployment can't exceed the free tier.
+
+**[→ Full step-by-step guide: `gcp-deploy/DEPLOY_GCP.md`](./gcp-deploy/DEPLOY_GCP.md)** — copy-paste `gcloud` commands for every phase: project + billing, budget alert, SSH key, VM, locked-down firewall, quota caps, DuckDNS cron, prebuilt-image Docker deploy, Caddy, and the smoke-test suite.
+
+Supporting templates (copy into place on the VM):
+- [`gcp-deploy/Caddyfile`](./gcp-deploy/Caddyfile) — reverse proxy with auto-HTTPS
+- [`gcp-deploy/duckdns-updater.sh`](./gcp-deploy/duckdns-updater.sh) — keeps your DuckDNS domain pointed at the static IP (cron, every 5 min)
+
+> **Tip:** pull the prebuilt image (`docker compose up -d --no-build`) instead of compiling on the VM — building the multi-stage Node image on an e2-micro's 1GB RAM thrashes the box.
 
 ## Desktop app
 
