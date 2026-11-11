@@ -483,4 +483,15 @@ describe('Anthropic-compatible /v1/messages', () => {
     expect(status).toBe(200);
     expect(body.map).toEqual({ default: 'auto', opus: 'auto', sonnet: 'auto', haiku: 'auto' });
   });
+
+  it('returns a 400 validation response for invalid model-map updates', async () => {
+    const headers = { Authorization: `Bearer ${dashToken}` };
+    const anthropic = await send(app, 'PUT', '/api/settings/anthropic-map', { unexpected: 'field' }, headers);
+    const gemini = await send(app, 'PUT', '/api/settings/gemini-map', { unexpected: 'field' }, headers);
+
+    expect(anthropic.status).toBe(400);
+    expect(anthropic.body.error.message).toContain('Invalid anthropic model map');
+    expect(gemini.status).toBe(400);
+    expect(gemini.body.error.message).toContain('Invalid Gemini model map');
+  });
 });

@@ -106,7 +106,7 @@ authRouter.post('/setup', (req: Request, res: Response) => {
 
   const parsed = credentialsSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: { message: parsed.error.errors.map(e => e.message).join(', ') } });
+    res.status(400).json({ error: { message: parsed.error.issues.map(e => e.message).join(', ') } });
     return;
   }
   const user = createUser(parsed.data.email, parsed.data.password);
@@ -118,7 +118,7 @@ authRouter.post('/setup', (req: Request, res: Response) => {
 authRouter.post('/login', (req: Request, res: Response) => {
   const parsed = credentialsSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: { message: parsed.error.errors.map(e => e.message).join(', ') } });
+    res.status(400).json({ error: { message: parsed.error.issues.map(e => e.message).join(', ') } });
     return;
   }
   const { email, password } = parsed.data;
@@ -169,7 +169,7 @@ authRouter.post('/change-email', (req: Request, res: Response) => {
   }
   const parsed = changeEmailSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: { message: parsed.error.errors.map(e => e.message).join(', ') } });
+    res.status(400).json({ error: { message: parsed.error.issues.map(e => e.message).join(', ') } });
     return;
   }
   try {
@@ -211,7 +211,7 @@ authRouter.post('/change-password', (req: Request, res: Response) => {
   }
   const parsed = changePasswordSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: { message: parsed.error.errors.map(e => e.message).join(', ') } });
+    res.status(400).json({ error: { message: parsed.error.issues.map(e => e.message).join(', ') } });
     return;
   }
   const ok = updatePassword(session.userId, parsed.data.currentPassword, parsed.data.newPassword);
@@ -259,7 +259,7 @@ const resetPasswordSchema = z.object({
 authRouter.post('/reset-password', (req: Request, res: Response) => {
   const parsed = resetPasswordSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: { message: parsed.error.errors.map(e => e.message).join(', ') } });
+    res.status(400).json({ error: { message: parsed.error.issues.map(e => e.message).join(', ') } });
     return;
   }
   if (!resetCodeMatches(parsed.data.resetCode)) {

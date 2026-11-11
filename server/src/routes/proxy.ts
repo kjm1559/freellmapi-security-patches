@@ -778,7 +778,7 @@ proxyRouter.post('/completions', async (req: Request, res: Response) => {
 
   const parsed = CompletionBody.safeParse(req.body);
   if (!parsed.success) {
-    const detail = parsed.error.errors
+    const detail = parsed.error.issues
       .map(e => (e.path.length ? `${e.path.join('.')}: ${e.message}` : e.message))
       .slice(0, 5)
       .join(', ');
@@ -1150,7 +1150,7 @@ proxyRouter.post('/chat/completions', async (req: Request, res: Response) => {
     // Path-qualified issues ("messages.1.content: Invalid input" beats a bare
     // "Invalid input") and a server-side breadcrumb — these rejections never
     // reach the request log, which made #200 nearly undebuggable.
-    const detail = parsed.error.errors
+    const detail = parsed.error.issues
       .map(e => (e.path.length ? `${e.path.join('.')}: ${e.message}` : e.message))
       .slice(0, 5)
       .join(', ');
